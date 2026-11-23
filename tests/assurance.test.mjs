@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {seedAssurance,validate,ancestorIds} from '../lib/assurance/model.ts';
-import {schedule,assess,resourceCaps,criticalLead,effectiveOrderPriority} from '../lib/assurance/engine.ts';
+import {schedule,assess,resourceCaps,criticalLead,effectiveOrderPriority,enumerate,explodeBom} from '../lib/assurance/engine.ts';
 import {executeAssurance,controlledSignal,ingest} from '../lib/assurance/commands.ts';
 import {isOwnerIdentity,tenantKey} from '../lib/access-policy.ts';
 import {applySampleEdits} from '../lib/assurance/sample-edits.ts';
@@ -69,6 +69,37 @@ test('penalty exposure rounds partial cases up and excludes standard-order short
 test('promotional allocations respect the configured campaign delivery window',()=>{
  const s=seedAssurance(),promo=s.commitments.find(c=>c.id==='SALE-CREAM-PROMO');promo.promoWindowStart='2026-10-23';
  const p=schedule(s,'economical'),moves=p.allocations.filter(a=>a.option.commitmentId===promo.id);assert.ok(moves.length>0);assert.ok(moves.every(a=>a.option.arrival>='2026-10-23'&&a.option.arrival<=promo.promoWindowEnd));
+});
+
+test('supplier qualification gates alternatives and p85 lead time changes arrival feasibility',()=>{
+ const s=seedAssurance();s.supplierProfiles.find(p=>p.supplierId==='SUP-B').qualificationStatus='BLOCKED';assert.ok(!enumerate(s,true).some(o=>o.evidence.includes('PACK-B')));
+ const qualified=seedAssurance();qualified.supplierProfiles.find(p=>p.supplierId==='SUP-B').leadTimeP85Days=2;const packOptions=enumerate(qualified,true).filter(o=>o.evidence.includes('PACK-B'));
+ assert.ok(packOptions.length>0);assert.ok(packOptions.every(o=>o.steps.find(x=>x.edgeId==='B-FACTORY').arrive>='2026-10-21'));
+});
+
+test('recursive BOM planning sources a subassembly through its own recipe',()=>{
+ const s=seedAssurance();s.items.push({id:'BASE-RESIN',name:'Base resin',kind:'MATERIAL',uom:'unit'});s.lots=s.lots.filter(l=>l.itemId!=='BOTTLE');s.lots.push({id:'RESIN-STOCK',nodeId:'FACTORY',itemId:'BASE-RESIN',qty:10000,reserved:0,safety:0,availableOn:'2026-10-19',expiry:'2028-01-01',market:'*',status:'RELEASED',unitCostPence:3,stamp:{...s.lots[0].stamp,recordId:'RESIN-STOCK'}});s.resources.push({id:'MOLD-LINE',nodeId:'FACTORY',dailyCapacity:2500,blockedDays:[],stamp:{...s.resources[0].stamp,recordId:'MOLD-LINE'}});s.recipes.push({id:'MOLD-BOTTLE',nodeId:'FACTORY',outputItemId:'BOTTLE',inputs:[{itemId:'BASE-RESIN',qtyPerUnit:1}],resourceId:'MOLD-LINE',days:1,unitCostPence:2,market:'UK',expiry:'2027-12-31',stamp:{...s.recipes[0].stamp,recordId:'MOLD-BOTTLE'}});validate(s);
+ const opts=enumerate(s,true).filter(o=>o.commitmentId==='SALE-A'&&o.evidence.includes('RESIN-STOCK'));assert.ok(opts.length>0);assert.ok(opts.some(o=>o.steps.some(x=>x.edgeId==='MOLD-BOTTLE')&&o.steps.some(x=>x.edgeId==='MAKE-SERUM')));const tree=explodeBom(s,'SERUM',100,'2026-10-24','UK','FACTORY');assert.ok(tree.children.some(x=>x.itemId==='BOTTLE'));
+});
+
+test('BOM validation rejects circular recipes and chains deeper than six levels',()=>{
+ const circular=seedAssurance();circular.recipes.push({...circular.recipes[0],id:'MAKE-BOTTLE',outputItemId:'BOTTLE',inputs:[{itemId:'SERUM',qtyPerUnit:1}]});assert.throws(()=>validate(circular),/circular item dependency/);
+ const deep=seedAssurance();for(let i=0;i<7;i++){const output=`SUB-${i}`,input=i===6?'BOTTLE':`SUB-${i+1}`;deep.items.push({id:output,name:output,kind:'MATERIAL',uom:'unit'});deep.recipes.push({...deep.recipes[0],id:`MAKE-${output}`,outputItemId:output,inputs:[{itemId:input,qtyPerUnit:1}]});}assert.throws(()=>validate(deep),/six-level BOM depth/);
+});
+
+test('cost categories reconcile to plan spend and compare recovery with inaction',()=>{
+ const s=seedAssurance();s.lots.find(l=>l.id==='NORTH-CREAM').qty=600;const p=schedule(s,'economical'),c=p.costBreakdown;
+ assert.equal(c.transportPence+c.fixedLanePence+c.productionPence+c.materialPence+c.premiumFreightPence+c.supplierPremiumPence,p.costPence);
+ assert.equal(c.recoveryTotalPence,p.costPence+c.customerPenaltyPence+c.writeOffRiskPence);
+ assert.equal(c.netSavingVsInactionPence,c.doNothingPenaltyPence+c.doNothingLostRevenuePence-(c.networkSpendDeltaPence+c.customerPenaltyPence+c.writeOffRiskPence+c.planLostRevenuePence));
+});
+
+test('multiple disruptions are retained and applied in one combined planning state',()=>{
+ const l=lab();l.act('scenarios',{scenarios:['supplier','warehouse','transport']});assert.equal(l.state.disruptions.filter(d=>d.active).length,3);assert.equal(l.state.observations.length,3);assert.equal(l.state.lots.find(x=>x.id==='PACK-A').availableOn,'2026-10-23');assert.equal(l.state.lots.find(x=>x.id==='SOUTH-SERUM').status,'HOLD');assert.equal(l.state.lanes.find(x=>x.id==='N-A').blocked,true);
+});
+
+test('expedite response is logged and confirmed source changes invalidate old plans',()=>{
+ const l=lab();l.act('scenario',{scenario:'supplier'});l.act('plans');const d=l.state.disruptions.find(x=>x.active&&x.type==='SUPPLIER_LATE');const draft=l.act('expedite-draft',{expediteId:d.id}).result;assert.match(draft.draftText,/PO-PACK-A/);assert.match(draft.draftText,/customer units short/);l.act('expedite-send',{expediteId:draft.id});const response=l.act('expedite-response',{expediteId:draft.id,response:{type:'PARTIAL',confirmedQty:3000,confirmedDate:'2026-10-21',notes:'Split delivery confirmed'}});assert.equal(response.result.recalculationRequired,true);assert.equal(l.state.expediteRequests[0].status,'RESPONDED');assert.equal(l.state.lots.find(x=>x.id==='PACK-A').qty,3000);assert.equal(l.state.lots.find(x=>x.id==='PACK-A').availableOn,'2026-10-21');assert.ok(l.state.plans[0].schedule.revision<l.state.factsRevision);
 });
 
 test('schema v1 datasets without commercial fields migrate to standard orders and default weights',()=>{
