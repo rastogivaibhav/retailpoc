@@ -1,0 +1,861 @@
+{
+  "schemaVersion": 1,
+  "tenantId": "illustrative-beauty-validation",
+  "label": "Illustrative beauty supply-chain validation dataset — not L’Oréal data",
+  "revision": 0,
+  "factsRevision": 0,
+  "clock": "2026-10-21T09:00:00.000Z",
+  "actuals": [],
+  "executedUsage": {},
+  "nodes": [
+    {
+      "id": "SUP-A",
+      "name": "Primary packaging supplier",
+      "kind": "SUPPLIER",
+      "organisationId": "DEMO-SUP-A"
+    },
+    {
+      "id": "SUP-B",
+      "name": "Contingency packaging supplier",
+      "kind": "SUPPLIER",
+      "organisationId": "DEMO-SUP-B"
+    },
+    {
+      "id": "FACTORY",
+      "name": "Skincare filling plant",
+      "kind": "FACTORY",
+      "organisationId": "DEMO-BEAUTY"
+    },
+    {
+      "id": "DC-N",
+      "name": "North distribution centre",
+      "kind": "DC",
+      "organisationId": "DEMO-BEAUTY"
+    },
+    {
+      "id": "DC-S",
+      "name": "South distribution centre",
+      "kind": "DC",
+      "organisationId": "DEMO-BEAUTY"
+    },
+    {
+      "id": "RETAIL-A",
+      "name": "National beauty retailer",
+      "kind": "RETAILER",
+      "organisationId": "DEMO-RETAIL-A"
+    },
+    {
+      "id": "RETAIL-B",
+      "name": "Regional beauty retailer",
+      "kind": "RETAILER",
+      "organisationId": "DEMO-RETAIL-B"
+    },
+    {
+      "id": "ONLINE",
+      "name": "Online marketplace",
+      "kind": "CUSTOMER",
+      "organisationId": "DEMO-DIGITAL"
+    }
+  ],
+  "items": [
+    {
+      "id": "BOTTLE",
+      "name": "Glass serum bottle",
+      "kind": "MATERIAL",
+      "uom": "unit"
+    },
+    {
+      "id": "PUMP",
+      "name": "Serum pump",
+      "kind": "MATERIAL",
+      "uom": "unit"
+    },
+    {
+      "id": "SERUM",
+      "name": "Hydrating face serum",
+      "kind": "FINISHED",
+      "uom": "unit"
+    },
+    {
+      "id": "CREAM",
+      "name": "Daily face cream",
+      "kind": "FINISHED",
+      "uom": "unit"
+    }
+  ],
+  "lots": [
+    {
+      "id": "PACK-A",
+      "nodeId": "SUP-A",
+      "itemId": "BOTTLE",
+      "qty": 1800,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2028-12-31",
+      "market": "*",
+      "status": "RELEASED",
+      "unitCostPence": 9,
+      "stamp": {
+        "system": "SUPPLIER",
+        "recordId": "PACK-A",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "PACK-B",
+      "nodeId": "SUP-B",
+      "itemId": "BOTTLE",
+      "qty": 600,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2028-12-31",
+      "market": "*",
+      "status": "RELEASED",
+      "unitCostPence": 42,
+      "recoveryOnly": true,
+      "stamp": {
+        "system": "SUPPLIER",
+        "recordId": "PACK-B",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "PUMP-A",
+      "nodeId": "SUP-A",
+      "itemId": "PUMP",
+      "qty": 2200,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2028-12-31",
+      "market": "*",
+      "status": "RELEASED",
+      "unitCostPence": 5,
+      "stamp": {
+        "system": "SUPPLIER",
+        "recordId": "PUMP-A",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "PUMP-B",
+      "nodeId": "SUP-B",
+      "itemId": "PUMP",
+      "qty": 500,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2028-12-31",
+      "market": "*",
+      "status": "RELEASED",
+      "unitCostPence": 28,
+      "recoveryOnly": true,
+      "stamp": {
+        "system": "SUPPLIER",
+        "recordId": "PUMP-B",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SERUM-NORTH",
+      "nodeId": "DC-N",
+      "itemId": "SERUM",
+      "qty": 900,
+      "reserved": 200,
+      "safety": 200,
+      "availableOn": "2026-10-21",
+      "expiry": "2027-12-31",
+      "market": "UK",
+      "status": "RELEASED",
+      "unitCostPence": 0,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SERUM-NORTH",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SOUTH-SERUM",
+      "nodeId": "DC-S",
+      "itemId": "SERUM",
+      "qty": 1200,
+      "reserved": 200,
+      "safety": 200,
+      "availableOn": "2026-10-21",
+      "expiry": "2027-12-31",
+      "market": "UK",
+      "status": "RELEASED",
+      "unitCostPence": 0,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SERUM-SOUTH",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SERUM-QA-HOLD",
+      "nodeId": "DC-S",
+      "itemId": "SERUM",
+      "qty": 400,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2027-12-31",
+      "market": "UK",
+      "status": "HOLD",
+      "unitCostPence": 0,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SERUM-QA-HOLD",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SERUM-EU-LABEL",
+      "nodeId": "DC-N",
+      "itemId": "SERUM",
+      "qty": 300,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2027-12-31",
+      "market": "EU",
+      "status": "RELEASED",
+      "unitCostPence": 0,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SERUM-EU-LABEL",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SERUM-SHORT-LIFE",
+      "nodeId": "DC-N",
+      "itemId": "SERUM",
+      "qty": 250,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2027-01-01",
+      "market": "UK",
+      "status": "RELEASED",
+      "unitCostPence": 0,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SERUM-SHORT-LIFE",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "CREAM-NORTH",
+      "nodeId": "DC-N",
+      "itemId": "CREAM",
+      "qty": 400,
+      "reserved": 100,
+      "safety": 50,
+      "availableOn": "2026-10-21",
+      "expiry": "2027-12-31",
+      "market": "UK",
+      "status": "RELEASED",
+      "unitCostPence": 0,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "CREAM-NORTH",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "BOTTLE-PLANT",
+      "nodeId": "FACTORY",
+      "itemId": "BOTTLE",
+      "qty": 300,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2028-12-31",
+      "market": "*",
+      "status": "RELEASED",
+      "unitCostPence": 12,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "BOTTLE-PLANT",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "PUMP-PLANT",
+      "nodeId": "FACTORY",
+      "itemId": "PUMP",
+      "qty": 200,
+      "reserved": 0,
+      "safety": 0,
+      "availableOn": "2026-10-21",
+      "expiry": "2028-12-31",
+      "market": "*",
+      "status": "RELEASED",
+      "unitCostPence": 8,
+      "stamp": {
+        "system": "ERP",
+        "recordId": "PUMP-PLANT",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    }
+  ],
+  "lanes": [
+    {
+      "id": "A-FACTORY",
+      "from": "SUP-A",
+      "to": "FACTORY",
+      "items": [
+        "BOTTLE",
+        "PUMP"
+      ],
+      "days": 1,
+      "dailyCapacity": 2200,
+      "unitCostPence": 3,
+      "fixedPence": 5000,
+      "blocked": false,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "A-FACTORY",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "B-FACTORY",
+      "from": "SUP-B",
+      "to": "FACTORY",
+      "items": [
+        "BOTTLE",
+        "PUMP"
+      ],
+      "days": 1,
+      "dailyCapacity": 600,
+      "unitCostPence": 25,
+      "fixedPence": 9000,
+      "blocked": false,
+      "recoveryOnly": true,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "B-FACTORY",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "F-N",
+      "from": "FACTORY",
+      "to": "DC-N",
+      "items": [
+        "SERUM",
+        "CREAM"
+      ],
+      "days": 1,
+      "dailyCapacity": 1200,
+      "unitCostPence": 2,
+      "fixedPence": 3000,
+      "blocked": false,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "F-N",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "F-S",
+      "from": "FACTORY",
+      "to": "DC-S",
+      "items": [
+        "SERUM"
+      ],
+      "days": 1,
+      "dailyCapacity": 900,
+      "unitCostPence": 2,
+      "fixedPence": 3000,
+      "blocked": false,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "F-S",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "S-N",
+      "from": "DC-S",
+      "to": "DC-N",
+      "items": [
+        "SERUM"
+      ],
+      "days": 1,
+      "dailyCapacity": 400,
+      "unitCostPence": 10,
+      "fixedPence": 4000,
+      "blocked": false,
+      "recoveryOnly": true,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "S-N",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "N-A",
+      "from": "DC-N",
+      "to": "RETAIL-A",
+      "items": [
+        "SERUM",
+        "CREAM"
+      ],
+      "days": 1,
+      "dailyCapacity": 900,
+      "unitCostPence": 3,
+      "fixedPence": 2000,
+      "blocked": false,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "N-A",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "N-A-EXPRESS",
+      "from": "DC-N",
+      "to": "RETAIL-A",
+      "items": [
+        "SERUM",
+        "CREAM"
+      ],
+      "days": 1,
+      "dailyCapacity": 350,
+      "unitCostPence": 30,
+      "fixedPence": 12000,
+      "blocked": false,
+      "recoveryOnly": true,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "N-A-EXPRESS",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "S-B",
+      "from": "DC-S",
+      "to": "RETAIL-B",
+      "items": [
+        "SERUM"
+      ],
+      "days": 1,
+      "dailyCapacity": 750,
+      "unitCostPence": 4,
+      "fixedPence": 2500,
+      "blocked": false,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "S-B",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "N-ONLINE",
+      "from": "DC-N",
+      "to": "ONLINE",
+      "items": [
+        "SERUM"
+      ],
+      "days": 1,
+      "dailyCapacity": 550,
+      "unitCostPence": 8,
+      "fixedPence": 4500,
+      "blocked": false,
+      "stamp": {
+        "system": "TMS",
+        "recordId": "N-ONLINE",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    }
+  ],
+  "resources": [
+    {
+      "id": "FILL-LINE",
+      "nodeId": "FACTORY",
+      "dailyCapacity": 850,
+      "blockedDays": [
+        "2026-10-23"
+      ],
+      "stamp": {
+        "system": "MES",
+        "recordId": "FILL-LINE",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    }
+  ],
+  "recipes": [
+    {
+      "id": "MAKE-SERUM",
+      "nodeId": "FACTORY",
+      "outputItemId": "SERUM",
+      "inputs": [
+        {
+          "itemId": "BOTTLE",
+          "qtyPerUnit": 1
+        },
+        {
+          "itemId": "PUMP",
+          "qtyPerUnit": 1
+        }
+      ],
+      "resourceId": "FILL-LINE",
+      "days": 1,
+      "unitCostPence": 25,
+      "market": "UK",
+      "expiry": "2027-12-31",
+      "stamp": {
+        "system": "MES",
+        "recordId": "MAKE-SERUM",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    }
+  ],
+  "commitments": [
+    {
+      "id": "PO-PACK-A",
+      "kind": "PURCHASE",
+      "from": "SUP-A",
+      "to": "FACTORY",
+      "itemId": "BOTTLE",
+      "qty": 1800,
+      "uom": "unit",
+      "due": "2026-10-22",
+      "market": "*",
+      "minShelfDays": 0,
+      "unitValuePence": 9,
+      "priority": 1,
+      "dependencies": [],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "PO-PACK-A",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "PO-PUMP-A",
+      "kind": "PURCHASE",
+      "from": "SUP-A",
+      "to": "FACTORY",
+      "itemId": "PUMP",
+      "qty": 2200,
+      "uom": "unit",
+      "due": "2026-10-22",
+      "market": "*",
+      "minShelfDays": 0,
+      "unitValuePence": 5,
+      "priority": 1,
+      "dependencies": [],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "PO-PUMP-A",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "MO-SERUM",
+      "kind": "PRODUCTION",
+      "from": "FACTORY",
+      "to": "FACTORY",
+      "itemId": "SERUM",
+      "qty": 1200,
+      "uom": "unit",
+      "due": "2026-10-23",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 2200,
+      "priority": 1,
+      "dependencies": [
+        "PO-PACK-A",
+        "PO-PUMP-A"
+      ],
+      "stamp": {
+        "system": "MES",
+        "recordId": "MO-SERUM",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "REPL-N",
+      "kind": "REPLENISHMENT",
+      "from": "FACTORY",
+      "to": "DC-N",
+      "itemId": "SERUM",
+      "qty": 1100,
+      "uom": "unit",
+      "due": "2026-10-24",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 2200,
+      "priority": 1,
+      "dependencies": [
+        "MO-SERUM"
+      ],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "REPL-N",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "REPL-S",
+      "kind": "REPLENISHMENT",
+      "from": "FACTORY",
+      "to": "DC-S",
+      "itemId": "SERUM",
+      "qty": 600,
+      "uom": "unit",
+      "due": "2026-10-24",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 2200,
+      "priority": 2,
+      "dependencies": [
+        "MO-SERUM"
+      ],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "REPL-S",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SALE-A",
+      "kind": "SALE",
+      "from": "DC-N",
+      "to": "RETAIL-A",
+      "itemId": "SERUM",
+      "qty": 1000,
+      "uom": "unit",
+      "due": "2026-10-24",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 2200,
+      "priority": 1,
+      "dependencies": [
+        "REPL-N"
+      ],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SALE-A",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SALE-B",
+      "kind": "SALE",
+      "from": "DC-S",
+      "to": "RETAIL-B",
+      "itemId": "SERUM",
+      "qty": 500,
+      "uom": "unit",
+      "due": "2026-10-25",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 2200,
+      "priority": 2,
+      "dependencies": [
+        "REPL-S"
+      ],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SALE-B",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SALE-ONLINE",
+      "kind": "SALE",
+      "from": "DC-N",
+      "to": "ONLINE",
+      "itemId": "SERUM",
+      "qty": 400,
+      "uom": "unit",
+      "due": "2026-10-23",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 2200,
+      "priority": 1,
+      "dependencies": [
+        "REPL-N"
+      ],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SALE-ONLINE",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    },
+    {
+      "id": "SALE-CREAM",
+      "kind": "SALE",
+      "from": "DC-N",
+      "to": "RETAIL-A",
+      "itemId": "CREAM",
+      "qty": 200,
+      "uom": "unit",
+      "due": "2026-10-22",
+      "market": "UK",
+      "minShelfDays": 180,
+      "unitValuePence": 1600,
+      "priority": 1,
+      "dependencies": [],
+      "stamp": {
+        "system": "ERP",
+        "recordId": "SALE-CREAM",
+        "sourceAt": "2026-10-21T09:00:00.000Z",
+        "observedAt": "2026-10-21T09:00:00.000Z",
+        "version": 1,
+        "provenance": "CONTROLLED"
+      }
+    }
+  ],
+  "observations": [],
+  "risks": [],
+  "plans": [],
+  "audit": [],
+  "requests": {},
+  "policies": {
+    "freshnessHours": 24,
+    "watchSlackDays": 1,
+    "maxHorizonDays": 8,
+    "owners": {
+      "availableOn": "SUPPLIER",
+      "status": "ERP",
+      "qty": "ERP",
+      "blocked": "TMS",
+      "dailyCapacity": "MES",
+      "due": "ERP"
+    }
+  },
+  "sources": [
+    {
+      "id": "ERP",
+      "label": "Illustrative order and inventory records",
+      "mode": "CONTROLLED",
+      "lastSync": "2026-10-21T09:00:00.000Z"
+    },
+    {
+      "id": "SUPPLIER",
+      "label": "Illustrative supplier observations",
+      "mode": "CONTROLLED",
+      "lastSync": "2026-10-21T09:00:00.000Z"
+    },
+    {
+      "id": "TMS",
+      "label": "Illustrative transport lane records",
+      "mode": "CONTROLLED",
+      "lastSync": "2026-10-21T09:00:00.000Z"
+    },
+    {
+      "id": "MES",
+      "label": "Illustrative manufacturing records",
+      "mode": "CONTROLLED",
+      "lastSync": "2026-10-21T09:00:00.000Z"
+    },
+    {
+      "id": "ERPNext",
+      "label": "ERPNext",
+      "mode": "UNCONNECTED"
+    }
+  ],
+  "notificationRead": []
+}

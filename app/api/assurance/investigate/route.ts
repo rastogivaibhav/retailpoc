@@ -1,0 +1,15 @@
+import {requireOwner} from '../../../../lib/auth';
+import {scope,read,db,ensure} from '../../../../lib/assurance/store';
+import {investigateNetwork} from '../../../../lib/assurance/investigator';
+import {providerKey,ensureAI} from '../../../../lib/ai-storage';
+import {DomainError} from '../../../../lib/domain';
+export const dynamic='force-dynamic';
+const json=(v:unknown,status=200)=>Response.json(v,{status,headers:{'Cache-Control':'no-store'}});
+export async function POST(req:Request){let lease='';try{
+ const origin=req.headers.get('origin');if(origin&&origin!==new URL(req.url).origin)return json({error:'Cross-origin action rejected'},403);await requireOwner();const p=(await scope(req))!;const raw=await req.text();if(raw.length>1000)return json({error:'Request too large'},413);const b=JSON.parse(raw);if(typeof b.commitmentId!=='string')return json({error:'Commitment ID required'},400);
+ const s=await read(p.tenantId);if(s.revision!==b.expectedRevision)return json({error:'Data changed. Refresh before investigating.'},409);await ensureAI();await ensure();
+ await db().prepare('CREATE TABLE IF NOT EXISTS assurance_ai_runs (tenant_id TEXT NOT NULL,id TEXT NOT NULL,created_at TEXT NOT NULL,snapshot TEXT NOT NULL,PRIMARY KEY(tenant_id,id))').run();const count=await db().prepare('SELECT count(*) n FROM assurance_ai_runs WHERE tenant_id=? AND created_at>=?').bind(p.tenantId,new Date().toISOString().slice(0,10)).first<{n:number}>();if((count?.n||0)>=20)return json({error:'Daily network investigation limit reached'},429);
+ lease=crypto.randomUUID();const lock=await db().prepare('INSERT INTO agent_control VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET lease=excluded.lease,expires=excluded.expires WHERE agent_control.expires<?').bind('main',lease,Date.now()+100000,Date.now()).run();if(!lock.meta.changes){lease='';return json({error:'Another NVIDIA investigation is running. Retry later.'},429)}
+ const startedAt=new Date().toISOString();const run:{id:string;revision:number;commitmentId:string;startedAt:string;status:string;result?:unknown;error?:string}={id:lease,revision:s.revision,commitmentId:b.commitmentId,startedAt,status:'RUNNING'};
+ await db().prepare('INSERT INTO assurance_ai_runs VALUES (?,?,?,?)').bind(p.tenantId,lease,startedAt,JSON.stringify(run)).run();try{run.result=await investigateNetwork(s,b.commitmentId,await providerKey());run.status=(await read(p.tenantId)).revision===s.revision?'COMPLETED':'STALE';}catch(e){run.status='FAILED';run.error=e instanceof Error?e.message:'Investigation failed'}await db().prepare('UPDATE assurance_ai_runs SET snapshot=? WHERE tenant_id=? AND id=?').bind(JSON.stringify(run),p.tenantId,lease).run();if(run.status!=='COMPLETED')return json({error:run.error||'Workspace changed during investigation. Refresh and run again.'},502);return json({...run.result as object,runId:run.id});
+}catch(e){return json({error:e instanceof DomainError?e.message:'Network investigation failed'},e instanceof DomainError?e.status:500)}finally{if(lease)await db().prepare('UPDATE agent_control SET expires=? WHERE id=? AND lease=?').bind(Date.now()+10000,'main',lease).run()}}

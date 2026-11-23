@@ -1,0 +1,143 @@
+{
+  "label": "Beauty distribution \u00b7 eligible source on quality hold",
+  "provenance": "CONTROLLED",
+  "asOf": "2026-10-19",
+  "lots": [
+    {
+      "id": "UK-SERUM-01",
+      "sku": "SERUM-30",
+      "site": "Reading DC",
+      "qty": 100,
+      "reserved": 20,
+      "status": "RELEASED",
+      "expiry": "2027-12-31",
+      "market": "UK"
+    },
+    {
+      "id": "MID-SERUM-01",
+      "sku": "SERUM-30",
+      "site": "Midlands DC",
+      "qty": 360,
+      "reserved": 150,
+      "status": "HOLD",
+      "expiry": "2027-12-31",
+      "market": "UK"
+    },
+    {
+      "id": "MID-QA-HOLD",
+      "sku": "SERUM-30",
+      "site": "Midlands DC",
+      "qty": 400,
+      "reserved": 0,
+      "status": "HOLD",
+      "expiry": "2027-12-31",
+      "market": "UK"
+    },
+    {
+      "id": "MID-SHORT-DATE",
+      "sku": "SERUM-30",
+      "site": "Midlands DC",
+      "qty": 200,
+      "reserved": 0,
+      "status": "RELEASED",
+      "expiry": "2026-11-01",
+      "market": "UK"
+    },
+    {
+      "id": "MID-EU-LABEL",
+      "sku": "SERUM-30",
+      "site": "Midlands DC",
+      "qty": 180,
+      "reserved": 0,
+      "status": "RELEASED",
+      "expiry": "2027-12-31",
+      "market": "EU"
+    },
+    {
+      "id": "UK-CREAM-01",
+      "sku": "CREAM-50",
+      "site": "Reading DC",
+      "qty": 500,
+      "reserved": 0,
+      "status": "RELEASED",
+      "expiry": "2027-12-31",
+      "market": "UK"
+    }
+  ],
+  "orders": [
+    {
+      "id": "SO-1001",
+      "customer": "Beauty Retailer A",
+      "sku": "SERUM-30",
+      "site": "Reading DC",
+      "qty": 420,
+      "due": "2026-10-21",
+      "minShelfDays": 90,
+      "market": "UK",
+      "unitValuePence": 1800
+    },
+    {
+      "id": "SO-1002",
+      "customer": "Beauty Retailer B",
+      "sku": "SERUM-30",
+      "site": "Reading DC",
+      "qty": 200,
+      "due": "2026-10-22",
+      "minShelfDays": 90,
+      "market": "UK",
+      "unitValuePence": 1800
+    },
+    {
+      "id": "SO-1003",
+      "customer": "Online Channel",
+      "sku": "SERUM-30",
+      "site": "Reading DC",
+      "qty": 150,
+      "due": "2026-10-23",
+      "minShelfDays": 90,
+      "market": "UK",
+      "unitValuePence": 1800
+    },
+    {
+      "id": "SO-1004",
+      "customer": "Beauty Retailer C",
+      "sku": "CREAM-50",
+      "site": "Reading DC",
+      "qty": 120,
+      "due": "2026-10-21",
+      "minShelfDays": 90,
+      "market": "UK",
+      "unitValuePence": 1200
+    }
+  ],
+  "inbounds": [
+    {
+      "id": "IN-204",
+      "sku": "SERUM-30",
+      "site": "Reading DC",
+      "qty": 600,
+      "eta": "2026-10-24",
+      "expiry": "2027-12-31",
+      "market": "UK",
+      "status": "CONFIRMED"
+    }
+  ],
+  "lanes": [
+    {
+      "id": "MID-READ",
+      "from": "Midlands DC",
+      "to": "Reading DC",
+      "days": 1,
+      "capacity": 80,
+      "fixedPence": 4500,
+      "unitPence": 20
+    }
+  ],
+  "safety": [
+    {
+      "sku": "SERUM-30",
+      "site": "Midlands DC",
+      "qty": 100
+    }
+  ]
+}

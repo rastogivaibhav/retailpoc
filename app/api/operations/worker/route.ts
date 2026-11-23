@@ -1,0 +1,4 @@
+import {env} from 'cloudflare:workers';
+import {runWorker} from '../../../../lib/operations/runtime';
+export const dynamic='force-dynamic';
+export async function POST(req:Request){const token=req.headers.get('authorization')?.replace(/^Bearer /,'');if(!token||!env.OPERATIONS_RUNNER_KEY)return Response.json({error:'Runner authentication required'},{status:401});const digest=async(s:string)=>new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));const [a,b]=await Promise.all([digest(token),digest(env.OPERATIONS_RUNNER_KEY)]);if(!a.every((v,i)=>v===b[i]))return Response.json({error:'Runner authentication rejected'},{status:403});try{return Response.json(await runWorker(undefined,req.headers.get('x-assurance-runner')==='cloudflare-cron'?'CLOUDFLARE_CRON':'SERVICE'))}catch{return Response.json({error:'Background batch failed; persisted jobs retained'},{status:503})}}
