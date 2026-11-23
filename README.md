@@ -19,6 +19,14 @@ Customer sales can be classified as STANDARD, PROMOTIONAL, KEY_ACCOUNT_COMMITTED
 
 Promotional orders require a campaign window, units per case and a positive penalty per case. The planner only considers arrivals inside the window. Estimated short-case penalties use ceiling rounding and appear separately from transport and recovery execution cost; they are not booked charges or realised losses. The controlled dataset includes SALE-CREAM-PROMO (600 units, 12 units per case, £3.50 per short case).
 
+## Recovery planning extensions
+- Combined supplier, warehouse and transport disruptions are retained together and solved against the same constrained network. Current UI choices are the three defined scenarios; authoring arbitrary disruption types and a per-disruption quantified counterfactual remain future work.
+- Supplier profiles gate sources by qualification and approved item. Contingency sourcing uses the supplier P85 lead time and load rule. Metrics in the controlled dataset are illustrative; rolling supplier performance history is not connected.
+- The planner expands recursive bills of material to a validated maximum depth of six and rejects cycles. The material-requirements view is explanatory; the constrained plan remains the authority for shared inventory and capacity allocation.
+- Recovery cost separates transport, fixed lane, production, material, supplier premium, express freight, configured customer penalties and estimated write-off exposure. Lost sales use gross order value as a proxy, not profit or cash loss.
+- Supplier expedite requests are drafted, edited and logged for external sending. Replies are entered by a user; the app does not send supplier email or connect to a supplier portal.
+- `RecoveryConnector` defines the health, canonical read, draft action and reconciliation boundary. ERPNext has its own implemented owner-workspace adapter. SAP, Oracle, Kinaxis, Coupa, TMS and MES connectors remain customer-specific work; the interface does not imply those systems are connected.
+
 ## Pilot preparation
 - **Data and connections → Orders and stock** opens the editable ERP-style sample. Public visitors can recalculate temporary edits in their browser session; signed-in users can save the sample to their workspace. Neither path updates an ERP.
 - **Pilot toolkit → Measure results** records manually verified before/after metrics. The app calculates differences but does not attribute causality or claim savings.
