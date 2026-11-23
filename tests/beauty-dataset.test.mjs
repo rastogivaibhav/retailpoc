@@ -17,7 +17,7 @@ function assertCostsReconcile(state,plan){const move=plan.allocations.reduce((to
 
 test('illustrative beauty dataset validates and covers freshness, quality, market, expiry and capacity constraints',()=>{
  const state=dataset();assert.equal(state.nodes.length,8);assert.equal(state.commitments.filter(c=>c.kind==='SALE').length,4);assert.ok(state.clock.startsWith('2026-10-21'));
- const plan=schedule(state,'economical');assert.equal(plan.fulfilled,2100);assert.ok(plan.resources['resource:FILL-LINE:2026-10-22']);
+ const plan=schedule(state,'economical');assert.equal(plan.fulfilled,1800);assert.ok(plan.resources['resource:FILL-LINE:2026-10-22']);
  for(const allocation of plan.allocations){assert.ok(!allocation.option.evidence.includes('SERUM-QA-HOLD'));assert.ok(!allocation.option.evidence.includes('SERUM-EU-LABEL'));assert.ok(!allocation.option.evidence.includes('SERUM-SHORT-LIFE'));}
  assertCostsReconcile(state,plan);
 });

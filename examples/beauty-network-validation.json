@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "tenantId": "illustrative-beauty-validation",
-  "label": "Illustrative beauty supply-chain validation dataset — not L’Oréal data",
+  "label": "Illustrative beauty supply-chain validation dataset \u2014 not L\u2019Or\u00e9al data",
   "revision": 0,
   "factsRevision": 0,
   "clock": "2026-10-21T09:00:00.000Z",
@@ -817,6 +817,12 @@
     "freshnessHours": 24,
     "watchSlackDays": 1,
     "maxHorizonDays": 8,
+    "orderPriorityMultipliers": {
+      "STANDARD": 1,
+      "PROMOTIONAL": 10,
+      "KEY_ACCOUNT_COMMITTED": 5,
+      "CONTRACTUAL_MUST_SERVE": 50
+    },
     "owners": {
       "availableOn": "SUPPLIER",
       "status": "ERP",
@@ -857,5 +863,49 @@
       "mode": "UNCONNECTED"
     }
   ],
-  "notificationRead": []
+  "notificationRead": [],
+  "supplierProfiles": [
+    {
+      "supplierId": "SUP-A",
+      "name": "Primary packaging supplier",
+      "country": "GB",
+      "qualificationStatus": "APPROVED",
+      "otdRatePct": 96,
+      "leadTimeNominalDays": 1,
+      "leadTimeP50Days": 1,
+      "leadTimeP85Days": 2,
+      "leadTimeP95Days": 3,
+      "currentLoadPct": 68,
+      "activeFrameworkAgreement": true,
+      "lastAuditDate": "2026-09-20",
+      "approvedItems": [
+        "BOTTLE",
+        "PUMP"
+      ],
+      "primary": true,
+      "writeOffProbability": 0.05
+    },
+    {
+      "supplierId": "SUP-B",
+      "name": "Contingency packaging supplier",
+      "country": "GB",
+      "qualificationStatus": "CONDITIONAL",
+      "otdRatePct": 87.3,
+      "leadTimeNominalDays": 1,
+      "leadTimeP50Days": 1,
+      "leadTimeP85Days": 1,
+      "leadTimeP95Days": 3,
+      "currentLoadPct": 75,
+      "activeFrameworkAgreement": true,
+      "lastAuditDate": "2026-08-12",
+      "approvedItems": [
+        "BOTTLE",
+        "PUMP"
+      ],
+      "primary": false,
+      "writeOffProbability": 0.12
+    }
+  ],
+  "disruptions": [],
+  "expediteRequests": []
 }
