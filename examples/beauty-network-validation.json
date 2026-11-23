@@ -817,6 +817,12 @@
     "freshnessHours": 24,
     "watchSlackDays": 1,
     "maxHorizonDays": 8,
+    "orderPriorityMultipliers": {
+      "STANDARD": 1,
+      "PROMOTIONAL": 10,
+      "KEY_ACCOUNT_COMMITTED": 5,
+      "CONTRACTUAL_MUST_SERVE": 50
+    },
     "owners": {
       "availableOn": "SUPPLIER",
       "status": "ERP",

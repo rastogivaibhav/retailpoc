@@ -1,18 +1,18 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {seedAssurance,validate,ancestorIds} from '../lib/assurance/model.ts';
-import {schedule,assess,resourceCaps,criticalLead} from '../lib/assurance/engine.ts';
+import {schedule,assess,resourceCaps,criticalLead,effectiveOrderPriority} from '../lib/assurance/engine.ts';
 import {executeAssurance,controlledSignal,ingest} from '../lib/assurance/commands.ts';
 import {isOwnerIdentity,tenantKey} from '../lib/access-policy.ts';
 import {applySampleEdits} from '../lib/assurance/sample-edits.ts';
 function lab(today='2026-10-19'){let state=seedAssurance('test-tenant');return {get state(){return state},act(action,extra={}){const out=executeAssurance(state,{action,expectedRevision:state.revision,requestId:crypto.randomUUID(),...extra},'Test operator',today);state=out.state;return out;}};}
 const full=()=>{const l=lab();l.act('scenario',{scenario:'supplier'});l.act('plans');const id=l.state.plans[0].id;l.act('review',{planId:id});l.act('approve',{planId:id});l.act('send',{planId:id});return {l,id};};
-test('baseline jointly supports all customer and upstream commitments',()=>{const s=seedAssurance(),p=schedule(s,'baseline');assert.equal(p.fulfilled,6600);assert.ok(p.outcomes.every(o=>o.gap===0));assert.equal(p.solver.feasible,true);});
+test('baseline jointly supports all customer and upstream commitments including promotion',()=>{const s=seedAssurance(),p=schedule(s,'baseline');assert.equal(p.fulfilled,7200);assert.ok(p.outcomes.every(o=>o.gap===0));assert.equal(p.solver.feasible,true);assert.equal(p.penaltyPence,0);});
 test('temporary edits carry across scenarios without replacing scenario-specific records',()=>{const supplier=seedAssurance();const edits=[{group:'lots',id:'FACTORY-BOTTLES',field:'qty',value:2000},{group:'lots',id:'PACK-A',field:'availableOn',value:'2026-10-23'},{group:'clock',id:'scenario',field:'clock',value:'2026-10-21'}];const edited=applySampleEdits(supplier,edits);assert.equal(edited.lots.find(x=>x.id==='FACTORY-BOTTLES').qty,2000);assert.equal(edited.lots.find(x=>x.id==='PACK-A').availableOn,'2026-10-23');assert.equal(edited.clock,'2026-10-21T12:00:00Z');const warehouse=seedAssurance();warehouse.lots.find(x=>x.id==='SOUTH-SERUM').status='HOLD';const combined=applySampleEdits(warehouse,edits);assert.equal(combined.lots.find(x=>x.id==='SOUTH-SERUM').status,'HOLD');assert.equal(combined.lots.find(x=>x.id==='FACTORY-BOTTLES').qty,2000);assert.equal(combined.lots.find(x=>x.id==='PACK-A').availableOn,'2026-10-23');});
-test('supplier delay propagates through production and replenishment to dependent orders',()=>{const l=lab();l.act('scenario',{scenario:'supplier'});for(const id of ['PO-PACK-A','MO-SERUM','REPL-N','REPL-S','SALE-A','SALE-B'])assert.ok(l.state.risks.some(r=>r.commitmentId===id));assert.ok(!l.state.risks.some(r=>r.commitmentId==='SALE-CREAM'));assert.equal(schedule(l.state,'baseline').fulfilled,2200);});
+test('supplier delay propagates through production and replenishment to dependent orders',()=>{const l=lab();l.act('scenario',{scenario:'supplier'});for(const id of ['PO-PACK-A','MO-SERUM','REPL-N','REPL-S','SALE-A','SALE-B'])assert.ok(l.state.risks.some(r=>r.commitmentId===id));assert.ok(!l.state.risks.some(r=>r.commitmentId==='SALE-CREAM'));assert.equal(schedule(l.state,'baseline').fulfilled,2800);});
 test('existing stock buffers part of a supplier disruption',()=>{const l=lab();l.act('scenario',{scenario:'supplier'});const p=schedule(l.state,'baseline');assert.ok(p.outcomes.find(o=>o.commitmentId==='SALE-A').timelyQty>0);assert.ok(p.outcomes.find(o=>o.commitmentId==='SALE-B').timelyQty>0);});
-test('two solver alternatives recover customer demand with real cost/arrival tradeoffs',()=>{const l=lab();l.act('scenario',{scenario:'supplier'});const fast=schedule(l.state,'fast'),cheap=schedule(l.state,'economical');assert.equal(fast.fulfilled,6600);assert.equal(cheap.fulfilled,6600);assert.ok(fast.costPence>cheap.costPence);assert.notDeepEqual(fast.allocations,cheap.allocations);assert.equal(cheap.outcomes.find(o=>o.commitmentId==='PO-PACK-A').gap,6000);});
+test('two solver alternatives recover customer demand with real cost/arrival tradeoffs',()=>{const l=lab();l.act('scenario',{scenario:'supplier'});const fast=schedule(l.state,'fast'),cheap=schedule(l.state,'economical');assert.equal(fast.fulfilled,7200);assert.equal(cheap.fulfilled,7200);assert.ok(fast.costPence>cheap.costPence);assert.notDeepEqual(fast.allocations,cheap.allocations);assert.equal(cheap.outcomes.find(o=>o.commitmentId==='PO-PACK-A').gap,6000);});
 test('warehouse hold excludes the changed batch and leaves unaffected product covered',()=>{const l=lab();l.act('scenario',{scenario:'warehouse'});const p=schedule(l.state,'economical');assert.ok(p.allocations.every(a=>!a.option.evidence.includes('SOUTH-SERUM')));assert.equal(p.outcomes.find(o=>o.commitmentId==='SALE-CREAM').gap,0);});
-test('blocked route is excluded while alternate route capacity remains finite',()=>{const l=lab();l.act('scenario',{scenario:'transport'});const p=schedule(l.state,'economical');assert.ok(p.allocations.every(a=>!a.option.steps.some(x=>x.edgeId==='N-A')));assert.equal(p.fulfilled,6600);});
+test('blocked route is excluded while alternate route capacity remains finite',()=>{const l=lab();l.act('scenario',{scenario:'transport'});const p=schedule(l.state,'economical');assert.ok(p.allocations.every(a=>!a.option.steps.some(x=>x.edgeId==='N-A')));assert.equal(p.fulfilled,7200);});
 test('held, wrong-market and insufficient-life batches never enter allocation',()=>{for(const mode of ['baseline','fast','economical']){const p=schedule(seedAssurance(),mode);assert.ok(p.allocations.every(a=>!a.option.evidence.some(id=>['QA-SERUM','EU-SERUM','SHORT-SERUM'].includes(id))));}});
 test('finite stock and daily resources are never double-allocated across orders',()=>{const s=seedAssurance();s.resources[0].dailyCapacity=600;s.lanes.find(x=>x.id==='N-A').dailyCapacity=400;const p=schedule(s,'economical'),caps=resourceCaps(s);for(const [id,r] of Object.entries(p.resources))assert.ok(r.used<=caps[id]);assert.ok(p.allocations.every(a=>Number.isInteger(a.qty)&&a.qty>0));});
 test('shared route charges equal the fixed cost of each activated lane departure day',()=>{const s=seedAssurance(),p=schedule(s,'economical'),move=p.allocations.reduce((n,a)=>n+a.option.costPence*a.qty,0);const fixed=Object.entries(p.resources).filter(([id,r])=>id.startsWith('lane:')&&r.used>0).reduce((sum,[id])=>{const key=id.slice(5),at=key.lastIndexOf(':'),lane=s.lanes.find(x=>x.id===key.slice(0,at));return sum+(lane?.fixedPence||0)},0);assert.equal(p.costPence-move,fixed);});
@@ -45,3 +45,37 @@ test('supplier date plus warehouse hold or route disruption never use PACK-A bef
 test('review and approval reject any schedule with arrival dates before the operational date',()=>{const s=seedAssurance();const p=schedule(s,'economical');s.plans=[{id:'past-plan',schedule:{...p,allocations:p.allocations.map((a,i)=>i===0?{...a,option:{...a.option,arrival:'2026-10-20'}}:a)},status:'PROPOSED',events:[]}];s.revision++;const c={action:'review',planId:'past-plan',expectedRevision:s.revision,requestId:crypto.randomUUID()};assert.throws(()=>executeAssurance(s,c,'QA','2026-10-21'),/arrivals before today/);});
 test('approval rechecks arrival dates at approval time after a valid review',()=>{const s=seedAssurance();const p=schedule(s,'economical');s.plans=[{id:'moving-date-plan',schedule:{...p,allocations:p.allocations.map((a,i)=>i===0?{...a,option:{...a.option,arrival:'2026-10-20'}}:a)},status:'PROPOSED',events:[]}];s.revision++;const reviewed=executeAssurance(s,{action:'review',planId:'moving-date-plan',expectedRevision:s.revision,requestId:crypto.randomUUID()},'Planner','2026-10-19').state;reviewed.plans[0].schedule.allocations[0].option.arrival='2026-10-20';assert.throws(()=>executeAssurance(reviewed,{action:'approve',planId:'moving-date-plan',expectedRevision:reviewed.revision,requestId:crypto.randomUUID()},'Approver','2026-10-21'),/arrivals before today/);});
 test('uncertain source evidence blocks both review and approval',()=>{const s=seedAssurance();s.lots.find(l=>l.id==='PACK-A').stamp.sourceAt='2026-10-01T00:00:00Z';assess(s);const p=schedule(s,'economical');s.plans=[{id:'uncertain-plan',schedule:p,status:'PROPOSED',events:[]}];s.revision++;assert.throws(()=>executeAssurance(s,{action:'review',planId:'uncertain-plan',expectedRevision:s.revision,requestId:crypto.randomUUID()},'Planner','2026-10-19'),/evidence needs checking/);const fresh=seedAssurance();const q=schedule(fresh,'economical');fresh.plans=[{id:'review-then-stale-plan',schedule:q,status:'REVIEWED',events:[]}];fresh.lots.find(l=>l.id==='PACK-A').stamp.sourceAt='2026-10-01T00:00:00Z';assess(fresh);fresh.revision++;assert.throws(()=>executeAssurance(fresh,{action:'approve',planId:'review-then-stale-plan',expectedRevision:fresh.revision,requestId:crypto.randomUUID()},'Approver','2026-10-19'),/evidence needs checking/);});
+
+test('commercial order weights use configured type multiplier while retaining base priority',()=>{
+ const s=seedAssurance(),standard=s.commitments.find(c=>c.id==='SALE-CREAM'),promo=s.commitments.find(c=>c.id==='SALE-CREAM-PROMO');
+ assert.equal(standard.orderType,'STANDARD');assert.equal(effectiveOrderPriority(s,standard),1);assert.equal(effectiveOrderPriority(s,promo),10);
+ s.policies.orderPriorityMultipliers.PROMOTIONAL=20;assert.equal(effectiveOrderPriority(s,promo),20);
+});
+
+test('promotional priority protects the campaign order when eligible stock is short',()=>{
+ const s=seedAssurance();s.lots.find(l=>l.id==='NORTH-CREAM').qty=600;
+ const p=schedule(s,'baseline'),standard=p.outcomes.find(o=>o.commitmentId==='SALE-CREAM'),promo=p.outcomes.find(o=>o.commitmentId==='SALE-CREAM-PROMO');
+ assert.equal(promo.timelyQty,500);assert.equal(promo.gap,100);assert.equal(standard.timelyQty,0);
+ assert.deepEqual(p.penaltyExposure,[{commitmentId:'SALE-CREAM-PROMO',campaignName:'Beauty cream autumn promotion',shortUnits:100,unitsPerCase:12,shortCases:9,penaltyPerCasePence:350,penaltyPence:3150,complianceImpact:0.05}]);
+ assert.equal(p.penaltyPence,3150);
+});
+
+test('penalty exposure rounds partial cases up and excludes standard-order shortfalls',()=>{
+ const s=seedAssurance();s.lots.find(l=>l.id==='NORTH-CREAM').qty=600;
+ const p=schedule(s,'baseline');assert.equal(p.penaltyExposure[0].shortCases,9);assert.equal(p.penaltyExposure[0].penaltyPence,3150);
+ assert.ok(!p.penaltyExposure.some(x=>x.commitmentId==='SALE-CREAM'));
+});
+
+test('promotional allocations respect the configured campaign delivery window',()=>{
+ const s=seedAssurance(),promo=s.commitments.find(c=>c.id==='SALE-CREAM-PROMO');promo.promoWindowStart='2026-10-23';
+ const p=schedule(s,'economical'),moves=p.allocations.filter(a=>a.option.commitmentId===promo.id);assert.ok(moves.length>0);assert.ok(moves.every(a=>a.option.arrival>='2026-10-23'&&a.option.arrival<=promo.promoWindowEnd));
+});
+
+test('schema v1 datasets without commercial fields migrate to standard orders and default weights',()=>{
+ const s=seedAssurance();delete s.policies.orderPriorityMultipliers;delete s.commitments.find(c=>c.id==='SALE-A').orderType;validate(s);
+ assert.equal(s.commitments.find(c=>c.id==='SALE-A').orderType,'STANDARD');assert.deepEqual(s.policies.orderPriorityMultipliers,{STANDARD:1,PROMOTIONAL:10,KEY_ACCOUNT_COMMITTED:5,CONTRACTUAL_MUST_SERVE:50});
+});
+
+test('invalid promotional metadata, base priority and type multipliers are rejected at boundaries',()=>{
+ for(const mutate of [s=>{delete s.commitments.find(c=>c.id==='SALE-CREAM-PROMO').campaignName},s=>{s.commitments.find(c=>c.id==='SALE-CREAM-PROMO').promoWindowEnd='2026-10-01'},s=>{s.commitments.find(c=>c.id==='SALE-CREAM-PROMO').unitsPerCase=0},s=>{s.commitments.find(c=>c.id==='SALE-CREAM-PROMO').penaltyPerCasePence=-1},s=>{s.commitments.find(c=>c.id==='SALE-CREAM-PROMO').priority=0},s=>{s.commitments.find(c=>c.id==='SALE-CREAM-PROMO').priority=101},s=>{s.policies.orderPriorityMultipliers.PROMOTIONAL=0},s=>{s.policies.orderPriorityMultipliers.STANDARD=101}]){const s=seedAssurance();mutate(s);assert.throws(()=>validate(s));}
+});

@@ -14,6 +14,11 @@ A working, persistent supply-chain exception application. Change an inbound ETA,
 - Greedy planning heuristic; no global optimality claim.
 - Public engineering demonstration; production customer-data readiness, security review and customer outcomes are not established.
 
+## Commercial order priority
+Customer sales can be classified as STANDARD, PROMOTIONAL, KEY_ACCOUNT_COMMITTED or CONTRACTUAL_MUST_SERVE. Existing records without a class remain STANDARD. Base priority is an integer from 1–100; configurable policy multipliers default to 1×, 10×, 5× and 50× respectively.
+
+Promotional orders require a campaign window, units per case and a positive penalty per case. The planner only considers arrivals inside the window. Estimated short-case penalties use ceiling rounding and appear separately from transport and recovery execution cost; they are not booked charges or realised losses. The controlled dataset includes SALE-CREAM-PROMO (600 units, 12 units per case, £3.50 per short case).
+
 ## Pilot preparation
 - **Data and connections → Orders and stock** opens the editable ERP-style sample. Public visitors can recalculate temporary edits in their browser session; signed-in users can save the sample to their workspace. Neither path updates an ERP.
 - **Pilot toolkit → Measure results** records manually verified before/after metrics. The app calculates differences but does not attribute causality or claim savings.
