@@ -1,4 +1,5 @@
 import type {Assurance,Schedule} from './model';
+import {effectiveOrderPriority} from './engine.ts';
 
 export type IntelligenceSignal={id:string;severity:'HIGH'|'MEDIUM'|'LOW';title:string;detail:string;affected:string[];score?:number};
 
@@ -9,8 +10,9 @@ export function intelligenceSignals(state:Assurance, schedule:Schedule, today=ne
  if(unknown.length)signals.push({id:'evidence',severity:'HIGH',title:'Evidence needs checking',detail:`${unknown.length} dependency record(s) are stale, conflicting or incomplete. The planner will not invent certainty.`,affected:unknown.map(r=>r.commitmentId)});
  const shortages=schedule.outcomes.filter(o=>o.gap>0);
  if(shortages.length)signals.push({id:'service',severity:'HIGH',title:'Customer service exposure',detail:`${shortages.reduce((n,o)=>n+o.gap,0).toLocaleString()} customer or upstream units remain uncovered in this plan.`,affected:shortages.map(o=>o.commitmentId)});
- const exposed=shortages.map(o=>{const c=state.commitments.find(x=>x.id===o.commitmentId);return {o,c,score:(c?.priority||1)*10+o.gap*(c?.unitValuePence||0)/1000};}).sort((a,b)=>b.score-a.score);
+ const exposed=shortages.map(o=>{const c=state.commitments.find(x=>x.id===o.commitmentId);return {o,c,score:(c?effectiveOrderPriority(state,c):1)*10+o.gap*(c?.unitValuePence||0)/1000};}).sort((a,b)=>b.score-a.score);
  if(exposed.length){const top=exposed[0];signals.push({id:'priority',severity:'HIGH',title:'Priority exposure to resolve first',detail:`${top.o.commitmentId} is ranked first by business priority and value at risk. Score ${Math.round(top.score)}; use this ordering when assigning an owner.`,affected:exposed.slice(0,5).map(x=>x.o.commitmentId),score:Math.round(top.score)});}
+ const active=state.disruptions.filter(d=>d.active),byNode=new Map<string,typeof active>();for(const d of active)byNode.set(d.affectedNode,[...(byNode.get(d.affectedNode)||[]),d]);const compounding=[...byNode.entries()].filter(([,items])=>items.length>1);if(compounding.length)signals.push({id:'compounding',severity:'HIGH',title:'Disruptions compound at shared constraints',detail:compounding.map(([node,items])=>items.length+' active disruptions affect '+node+' (combined quantity impact '+items.reduce((n,x)=>n+x.quantityImpact,0)+').').join(' '),affected:compounding.flatMap(([,items])=>items.map(x=>x.id))});
  const constrained=Object.entries(schedule.resources).filter(([,r])=>r.capacity>0&&r.used/r.capacity>=.8);
  if(constrained.length)signals.push({id:'capacity',severity:'MEDIUM',title:'Capacity is becoming tight',detail:`${constrained.length} resource(s) are at or above 80% planned utilisation.`,affected:constrained.map(([id])=>id)});
  const idleValue=state.lots.filter(l=>l.status==='RELEASED'&&l.expiry<=state.clock.slice(0,10)).reduce((n,l)=>n+Math.max(0,l.qty-l.reserved-l.safety)*l.unitCostPence,0);
