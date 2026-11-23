@@ -28,5 +28,5 @@ export class Jobs {
  async audit(tenant:string,actor:string,action:string,detail:string){await this.db.prepare('INSERT INTO operations_audit VALUES (?,?,?,?,?,?)').bind(crypto.randomUUID(),tenant,new Date(this.now()).toISOString(),actor,action,detail.slice(0,2000)).run()}
 }
 export type Role='admin'|'viewer'|'planner'|'approver'|'operator';
-export function permitted(role:Role,action:string){if(role==='admin')return true;if(action==='read')return true;return ({viewer:[],planner:['plans','review','assign','acknowledge'],approver:['approve','assign','acknowledge'],operator:['send','cancel','draft','reconcile','assign','acknowledge']} as Record<string,string[]>)[role]?.includes(action)||false}
+export function permitted(role:Role,action:string){if(role==='admin')return true;if(action==='read')return true;return ({viewer:[],planner:['plans','review','assign','acknowledge','scenario','scenarios','policies','expedite-draft','expedite-edit','expedite-send','expedite-response','expedite-escalate'],approver:['approve','assign','acknowledge'],operator:['send','cancel','draft','reconcile','assign','acknowledge']} as Record<string,string[]>)[role]?.includes(action)||false}
 export function authorise(role:Role,action:string){must(permitted(role,action),'Your workspace role does not permit this action','FORBIDDEN',403)}
